@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
+@DiscriminatorValue("Manager")
 public class Manager extends Utilisateur {
 
     @OneToOne(mappedBy = "manager")

@@ -25,8 +25,6 @@ public class Conge {
     @OneToMany (mappedBy = "conge", cascade = CascadeType.ALL)
     private List<HistoriqueAction> historique = new ArrayList<>(); ;
 
-    @OneToMany (mappedBy = "conge", cascade = CascadeType.ALL)
-    private List<Notification> notification = new ArrayList<>();;
 
     @ManyToOne
     @JoinColumn(name = "employe_id")

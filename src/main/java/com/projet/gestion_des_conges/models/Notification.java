@@ -18,9 +18,7 @@ public class Notification {
     @ManyToOne
     @JoinColumn(name = "destinataire_id")
     private Utilisateur destinataire ;
-    @ManyToOne
-    @JoinColumn(name = "conger_id")
-    private Conge conge ;
+
 
     public Notification() {
     }
