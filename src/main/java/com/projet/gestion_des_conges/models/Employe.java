@@ -1,7 +1,10 @@
 package com.projet.gestion_des_conges.models;
 
 import jakarta.persistence.*;
+import lombok.*;
 
+@Getter
+@Setter
 @Entity
 @DiscriminatorValue("Employe")
 public class Employe extends Utilisateur {

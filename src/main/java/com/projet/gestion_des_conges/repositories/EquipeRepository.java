@@ -1,14 +1,13 @@
 package com.projet.gestion_des_conges.repositories;
 
+import com.projet.gestion_des_conges.models.Equipe;
 import com.projet.gestion_des_conges.models.Utilisateur;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
-public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> {
+public interface EquipeRepository extends JpaRepository<Equipe, Long> {
 
-     Optional<Utilisateur> findByEmail(String email);
+    Optional<Equipe> findByNom(String nom);
 
 }

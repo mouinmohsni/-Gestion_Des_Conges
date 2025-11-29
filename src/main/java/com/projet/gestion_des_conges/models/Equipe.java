@@ -1,9 +1,12 @@
 package com.projet.gestion_des_conges.models;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
 public class Equipe {
     @Id

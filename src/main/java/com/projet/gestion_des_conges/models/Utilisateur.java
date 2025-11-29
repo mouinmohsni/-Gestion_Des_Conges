@@ -1,8 +1,8 @@
 package com.projet.gestion_des_conges.models;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
 
 import java.util.List;
 
@@ -13,6 +13,8 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Utilisateur {
 
+    @Setter
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -26,6 +28,8 @@ public class Utilisateur {
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     private List<HistoriqueAction> historiqueActions;
 
+    private boolean actif;
+
     public Utilisateur() {
 
     }
@@ -35,8 +39,8 @@ public class Utilisateur {
         this.prenom = prenom;
         this.email = email;
         this.motDePasse = motDePasse;
+        this.actif = true;
 
     }
-
 
 }

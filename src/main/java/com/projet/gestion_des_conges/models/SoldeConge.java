@@ -1,7 +1,12 @@
 package com.projet.gestion_des_conges.models;
 
 import jakarta.persistence.*;
+import lombok.*;
 
+
+
+@Setter
+@Getter
 @Entity
 @Table(name="solde_conges")
 public class SoldeConge {
