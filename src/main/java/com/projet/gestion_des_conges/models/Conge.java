@@ -1,10 +1,15 @@
 package com.projet.gestion_des_conges.models;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Getter
+@Setter
 @Entity
 @Table(name="conges")
 
@@ -37,11 +42,5 @@ public class Conge {
     public Conge() {
     }
 
-    public long getId() {
-        return id;
-    }
 
-    public void setId(long id) {
-        this.id = id;
-    }
 }

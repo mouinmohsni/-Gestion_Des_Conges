@@ -1,5 +1,6 @@
 package com.projet.gestion_des_conges.services;
 
+import com.projet.gestion_des_conges.models.Employe;
 import com.projet.gestion_des_conges.models.SoldeConge;
 import com.projet.gestion_des_conges.repositories.SoldeCongeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,5 +37,10 @@ public class SoldeCongeService implements ISoldeCongeService {
     @Override
     public void deleteSoldeConge(Long id) {
         soldeCongeRepository.deleteById(id);
+    }
+
+    public SoldeConge findByEmploye(Employe employe){
+        return soldeCongeRepository.findByEmploye(employe);
+
     }
 }

@@ -22,11 +22,5 @@ public class Employe extends Utilisateur {
         super();
     }
 
-    public String getDepartment() {
-        return department;
-    }
 
-    public void setDepartment(String department) {
-        this.department = department;
-    }
 }

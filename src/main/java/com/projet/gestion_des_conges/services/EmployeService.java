@@ -6,6 +6,7 @@ import com.projet.gestion_des_conges.data_transfer_object.EmployeCreationRequest
 import com.projet.gestion_des_conges.models.*;
 import com.projet.gestion_des_conges.repositories.EmployeRepository;
 import com.projet.gestion_des_conges.repositories.EquipeRepository;
+import com.projet.gestion_des_conges.repositories.SoldeCongeRepository;
 import com.projet.gestion_des_conges.repositories.UtilisateurRepository;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,20 +26,31 @@ public class EmployeService {
     public final UtilisateurRepository utilisateurRepository;
     public final EmployeRepository employeRepository;
     public final EquipeRepository equipeRepository;
+    public final CongeService congeService;
+    private final SoldeCongeService soldeCongeService;
 
     @Autowired
     public EmployeService(
             UtilisateurRepository utilisateurRepository,
             EmployeRepository employeRepository,
-            EquipeRepository equipeRepository) {
+            EquipeRepository equipeRepository,
+            CongeService congeService,
+            SoldeCongeService soldeCongeService) {
 
         this.utilisateurRepository = utilisateurRepository;
         this.employeRepository = employeRepository;
         this.equipeRepository = equipeRepository;
+        this.congeService = congeService;
+        this.soldeCongeService = soldeCongeService;
     }
 
 
-
+    /**
+     *Crée un employé, hache le mdp, initialise le SoldeConge.
+     * @param request
+     * @param result
+     * @return Utilisateur
+     */
     public Utilisateur creerEmploye(EmployeCreationRequest request , BindingResult result)  {
 
         Optional<Utilisateur> potentialUtilisateur = utilisateurRepository.findByEmail(request.getEmail());
@@ -105,25 +118,70 @@ public class EmployeService {
 
     /**
      * Permet à un employé de soumettre une nouvelle demande de congé.
+     * @param employeId
+     * @param data
+     * @param result
+     * @return Conge
      */
     public Conge demanderConge(Long employeId, CongeCreationDto data, BindingResult result){
         Optional<Employe> employe = employeRepository.findById(employeId);
         if (employe.isEmpty()) {
             throw new RuntimeException("l'employer non trouvé !");
         }
+        Employe thisEmploye = employe.get();
         if (data.getDateDebut() != null && data.getDateFin() != null) {
             if (data.getDateDebut().isAfter(data.getDateFin())) {
                 result.rejectValue("dateFin", "DateError", "La date de fin doit être après la date de début.");
             }
         }
         Conge conge = new Conge();
+        conge.setDateDebut(data.getDateDebut());
+        conge.setDateFin(data.getDateFin());
+        conge.setEmploye(thisEmploye);
+        conge.setDateDemande(LocalDate.now());
+        conge.setCommentaire(data.getCommentaire());
+        conge.setStatut(StatutConge.EN_ATTENTE);
 
+        HistoriqueAction action = new HistoriqueAction();
+        action.setAction("CREATION_DEMANDE");
+        action.setDateAction(LocalDateTime.now());
+        action.setUtilisateur(thisEmploye);
+        action.setConge(conge);
+        conge.getHistorique().add(action);
 
-
-
-
+       return congeService.createConge(conge);
 
     }
+
+    /**
+     * Récupère l'historique de toutes les demandes de congé d'un employé.
+     * @param employeId
+     * @return  List<Conge>
+     */
+    public  List<Conge> consulterMesConges(long employeId ){
+        Optional<Employe> employe = employeRepository.findById(employeId);
+        if (employe.isEmpty()) {
+            throw new RuntimeException("l'employer non trouvé !");
+        }
+        Employe thisEmploye = employe.get();
+
+        return congeService.findByEmploye(thisEmploye);
+
+    };
+
+    /**
+     * Récupère le solde de congés actuel de l'employé.
+     * @param employeId
+     * @return SoldeConge
+     */
+    public  SoldeConge consulterMonSolde(long employeId ){
+        Optional<Employe> employe = employeRepository.findById(employeId);
+        if (employe.isEmpty()) {
+            throw new RuntimeException("l'employer non trouvé !");
+        }
+        Employe thisEmploye = employe.get();
+        return  soldeCongeService.findByEmploye(thisEmploye);
+    };
 
 
 

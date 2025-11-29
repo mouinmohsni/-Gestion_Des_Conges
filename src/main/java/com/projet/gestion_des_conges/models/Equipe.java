@@ -21,11 +21,5 @@ public class Equipe {
     @OneToMany(mappedBy = "equipe")
     private List<Employe> employes;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 }
