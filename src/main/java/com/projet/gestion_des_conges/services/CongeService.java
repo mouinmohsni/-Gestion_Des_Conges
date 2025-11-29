@@ -9,37 +9,33 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CongeService {
-
-    // 1. Injection par constructeur (meilleure pratique)
-    private final CongeRepository congeRepository;
+public class CongeService implements ICongeService {
 
     @Autowired
-    public CongeService(CongeRepository congeRepository) {
-        this.congeRepository = congeRepository;
+    private CongeRepository congeRepository;
+
+    @Override
+    public Conge getCongeById(Long id) {
+        return congeRepository.findById(id).get();
     }
 
-    public Conge createConge(Conge congeOfUser) {
-        return congeRepository.save(congeOfUser);
+    @Override
+    public Conge createConge(Conge conge) {
+        return congeRepository.save(conge);
     }
 
-
+    @Override
     public List<Conge> getAllConges() {
         return congeRepository.findAll();
     }
 
-    // 3. Gestion correcte de l'Optional pour éviter les crashs
-    public Optional<Conge> getCongeById(Long id) {
-        return congeRepository.findById(id);
+    @Override
+    public Conge updateConge(Conge conge) {
+        return congeRepository.saveAndFlush(conge);
     }
 
-    // 4. La méthode de suppression ne retourne rien (void)
+    @Override
     public void deleteConge(Long id) {
-        // On peut vérifier si le congé existe avant de le supprimer
-        if (!congeRepository.existsById(id)) {
-            // Lancer une exception pour dire que le congé n'a pas été trouvé
-            throw new IllegalStateException("Impossible de trouver le congé avec l'ID " + id);
-        }
         congeRepository.deleteById(id);
     }
 }

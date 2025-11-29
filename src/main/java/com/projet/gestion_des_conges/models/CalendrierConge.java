@@ -13,6 +13,15 @@ public class CalendrierConge {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  long id ;
     private  int mois ;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     private  int annee ;
 
     @ManyToMany(fetch = FetchType.LAZY)

@@ -22,4 +22,12 @@ public class Manager extends Utilisateur {
     public Manager() {
         super();
     }
+
+    public Equipe getEquipe() {
+        return equipe;
+    }
+
+    public void setEquipe(Equipe equipe) {
+        this.equipe = equipe;
+    }
 }
