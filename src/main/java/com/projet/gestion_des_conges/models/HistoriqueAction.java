@@ -14,6 +14,15 @@ public class HistoriqueAction {
     private String action ;
     private LocalDateTime dateAction ;
     private String detailsAction ;
+
+    public Utilisateur getUtilisateur() {
+        return utilisateur;
+    }
+
+    public void setUtilisateur(Utilisateur utilisateur) {
+        this.utilisateur = utilisateur;
+    }
+
     @ManyToOne
     @JoinColumn(name = "utilisateur_id")
     private Utilisateur utilisateur ;

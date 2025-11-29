@@ -15,6 +15,15 @@ public class Notification {
     private String type ;
     private LocalDateTime dateEnvoi;
     private String statut ;
+
+    public Utilisateur getDestinataire() {
+        return destinataire;
+    }
+
+    public void setDestinataire(Utilisateur destinataire) {
+        this.destinataire = destinataire;
+    }
+
     @ManyToOne
     @JoinColumn(name = "destinataire_id")
     private Utilisateur destinataire ;

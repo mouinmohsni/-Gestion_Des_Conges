@@ -21,6 +21,15 @@ public class Utilisateur {
     private String nom;
     private String prenom;
     private String email;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     private String motDePasse;
     @OneToMany (mappedBy = "destinataire", cascade = CascadeType.ALL)
     private List<Notification> notifications;
