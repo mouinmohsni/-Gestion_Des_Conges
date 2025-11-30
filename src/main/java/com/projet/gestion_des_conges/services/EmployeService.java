@@ -51,7 +51,7 @@ public class EmployeService {
      * @param result
      * @return Utilisateur
      */
-    public Utilisateur creerEmploye(EmployeCreationRequest request , BindingResult result)  {
+    public Employe creerEmploye(EmployeCreationRequest request , BindingResult result)  {
 
         Optional<Utilisateur> potentialUtilisateur = utilisateurRepository.findByEmail(request.getEmail());
         if (potentialUtilisateur.isPresent()) {
@@ -66,7 +66,7 @@ public class EmployeService {
 
         Optional<Equipe> equipeOptionnelle = equipeRepository.findById(request.getEquipeId());
         if (equipeOptionnelle.isEmpty()) {
-            result.rejectValue("equipeId", "CreationError", "L'équipe spécifiée n'existe pas.");
+            equipeOptionnelle= null ;
         }
 
         if (result.hasErrors()) {
@@ -74,7 +74,7 @@ public class EmployeService {
         }
 
         String motDePasseHache = BCrypt.hashpw(request.getMotDePasse(), BCrypt.gensalt());
-        request.setMotDePasse(motDePasseHache);
+
 
         Equipe equipeTrouvee = equipeOptionnelle.get();
 
@@ -121,7 +121,7 @@ public class EmployeService {
      * @param employeId
      * @param data
      * @param result
-     * @return Conge
+     * @return
      */
     public Conge demanderConge(Long employeId, CongeCreationDto data, BindingResult result){
         Optional<Employe> employe = employeRepository.findById(employeId);
@@ -182,6 +182,32 @@ public class EmployeService {
         Employe thisEmploye = employe.get();
         return  soldeCongeService.findByEmploye(thisEmploye);
     };
+
+    /**
+     *  Assigner ou desassigner un employer a une equipe
+     * @param employeId
+     * @param EquipeId
+     * @return
+     */
+    public Employe changerEquipe(Long employeId, Long EquipeId) {
+        Optional <Employe> employe = employeRepository.findById(employeId);
+        if (employe.isEmpty()) {
+            throw new RuntimeException("l'employer non trouvé !");
+        }
+        Employe thisEmploye = employe.get();
+        if(EquipeId == null){
+            thisEmploye.setEquipe(null);
+        }else {
+            Optional<Equipe> equipe = equipeRepository.findById(EquipeId);
+            if (equipe.isEmpty()) {
+                throw  new RuntimeException("Équipe non trouvée");
+            }
+            thisEmploye.setEquipe(equipe.get());
+
+
+        }
+        return employeRepository.save(thisEmploye);
+    }
 
 
 

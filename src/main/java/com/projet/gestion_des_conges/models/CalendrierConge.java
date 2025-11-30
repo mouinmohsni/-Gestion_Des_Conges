@@ -1,10 +1,13 @@
 package com.projet.gestion_des_conges.models;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Setter
+@Getter
 @Entity
 @Table(name="calendrier_conge")
 public class CalendrierConge {
@@ -13,15 +16,6 @@ public class CalendrierConge {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  long id ;
     private  int mois ;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
     private  int annee ;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -33,4 +27,6 @@ public class CalendrierConge {
     private List<Conge> conges = new ArrayList<>();
 
     private String equipe ;
+
+
 }

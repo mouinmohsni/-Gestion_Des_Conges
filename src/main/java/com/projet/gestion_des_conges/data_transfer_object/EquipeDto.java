@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
-public class EquipeCreationDto {
+public class EquipeDto {
 
     @NotEmpty(message = "Le nom de l'équipe est obligatoire.")
     private String nom;
