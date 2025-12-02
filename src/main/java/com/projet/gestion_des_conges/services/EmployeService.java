@@ -48,20 +48,18 @@ public class EmployeService {
     /**
      *Crée un employé, hache le mdp, initialise le SoldeConge.
      * @param request
-     * @param result
      * @return Utilisateur
      */
-    public Employe creerEmploye(EmployeCreationRequest request , BindingResult result)  {
+    public Employe creerEmploye(EmployeCreationRequest request )  {
 
         Optional<Utilisateur> potentialUtilisateur = utilisateurRepository.findByEmail(request.getEmail());
         if (potentialUtilisateur.isPresent()) {
-            result.rejectValue("email", "RegisterError", "Cette adresse email est déjà utilisée.");
-            return null;
+            throw  new IllegalArgumentException( "Cette adresse email est déjà utilisée.");
+
         }
 
         if (!request.getMotDePasse().equals(request.getConfPassword())) {
-            result.rejectValue("confpassword", "register error", "Passwords must match");
-            return null;
+            throw new IllegalArgumentException( "Passwords must match");
         }
 
         Optional<Equipe> equipeOptionnelle = equipeRepository.findById(request.getEquipeId());
@@ -69,9 +67,6 @@ public class EmployeService {
             equipeOptionnelle= null ;
         }
 
-        if (result.hasErrors()) {
-            return null;
-        }
 
         String motDePasseHache = BCrypt.hashpw(request.getMotDePasse(), BCrypt.gensalt());
 
@@ -88,13 +83,12 @@ public class EmployeService {
         nouvelEmploye.setDepartment(request.getDepartment());
 
 
-        // Créer et lier le solde de congés (logique inchangée)
         SoldeConge soldeInitial = new SoldeConge();
         soldeInitial.setAnnee(LocalDate.now().getYear());
         soldeInitial.setTotalAnnuel(25);
         soldeInitial.setRestant(25);
         nouvelEmploye.setSoldeConge(soldeInitial);
-        soldeInitial.setEmploye(nouvelEmploye);
+
 
 
         return employeRepository.save(nouvelEmploye);
@@ -139,13 +133,14 @@ public class EmployeService {
      * @param employeId
      * @return SoldeConge
      */
-    public  SoldeConge consulterMonSolde(long employeId ){
+    public  SoldeConge consulterMonSolde(long employeId ,int annee ){
         Optional<Employe> employe = employeRepository.findById(employeId);
         if (employe.isEmpty()) {
             throw new RuntimeException("l'employer non trouvé !");
         }
         Employe thisEmploye = employe.get();
-        return  soldeCongeService.findByEmploye(thisEmploye);
+
+        return  soldeCongeService.findByEmploye(thisEmploye,annee);
     };
 
     /**

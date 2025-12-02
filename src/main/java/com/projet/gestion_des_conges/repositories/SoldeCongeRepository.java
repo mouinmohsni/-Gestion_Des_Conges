@@ -5,8 +5,16 @@ import com.projet.gestion_des_conges.models.SoldeConge;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface SoldeCongeRepository extends JpaRepository<SoldeConge, Long> {
 
-    SoldeConge findByEmploye(Employe employe);
+
+
+
+    List<SoldeConge> findByEmploye(Employe employe);
+    Optional<SoldeConge> findByEmployeAndAnnee(Employe employe, int annee);
+
 }

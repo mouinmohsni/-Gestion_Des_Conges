@@ -22,24 +22,23 @@ public class ManagerService {
     public final UtilisateurRepository utilisateurRepository;
     public final EquipeRepository equipeRepository;
     final CongeRepository congeRepository;
-    final SoldeCongeRepository soldeCongeRepository ;
     final CalendrierCongeRepository calendrierCongeRepository ;
     final CalendrierCongeService calendrierCongeService;
+    private final SoldeCongeService soldeCongeService;
 
     public ManagerService(ManagerRepository managerRepository,
                           UtilisateurRepository utilisateurRepository,
                           EquipeRepository equipeRepository,
                           CongeRepository congeRepository,
-                          SoldeCongeRepository soldeCongeRepository,
                           CalendrierCongeRepository calendrierCongeRepository,
-                          CalendrierCongeService calendrierCongeService) {
+                          CalendrierCongeService calendrierCongeService, SoldeCongeService soldeCongeService) {
         this.managerRepository = managerRepository;
         this.utilisateurRepository = utilisateurRepository;
         this.equipeRepository = equipeRepository;
         this.congeRepository = congeRepository;
-        this.soldeCongeRepository = soldeCongeRepository;
         this.calendrierCongeRepository = calendrierCongeRepository;
         this.calendrierCongeService = calendrierCongeService;
+        this.soldeCongeService = soldeCongeService;
     }
 
 
@@ -106,20 +105,12 @@ public class ManagerService {
         }
 
         StatutConge newStatu  ;
-        SoldeConge soldeConge = conge.getEmploye().getSoldeConge();
         if (data.getStatut().equals(StatutConge.VALIDE)) {
-            long nbJour = ChronoUnit.DAYS.between(conge.getDateDebut(), conge.getDateFin()) + 1;
-            int reste = soldeConge.getRestant();
-            reste -= (int) nbJour;
-            soldeConge.setRestant(reste);
+            soldeCongeService.debiterSolde(conge);
             newStatu=StatutConge.VALIDE;
-
             int annee = conge.getDateDebut().getYear();
             int mois = conge.getDateDebut().getMonthValue();
             CalendrierConge calendrier =calendrierCongeService.mettreAJourCalendrier(conge, annee, mois);
-            soldeCongeRepository.save(soldeConge);
-
-
         }else if (data.getStatut() == StatutConge.REFUSE){
             newStatu=StatutConge.REFUSE;
         }else{
