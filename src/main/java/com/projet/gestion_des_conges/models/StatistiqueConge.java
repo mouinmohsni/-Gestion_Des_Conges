@@ -23,13 +23,6 @@ public class StatistiqueConge {
 
     private int congesAcceptes;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     private int congesRefuses;
 

@@ -4,11 +4,15 @@ import com.projet.gestion_des_conges.data_transfer_object.EquipeDto;
 import com.projet.gestion_des_conges.models.Employe;
 import com.projet.gestion_des_conges.models.Equipe;
 import com.projet.gestion_des_conges.repositories.EquipeRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.util.List;
 import java.util.Optional;
 
+@Transactional
+@Service
 public class EquipeService {
 
     final EquipeRepository equipeRepository;
