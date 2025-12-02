@@ -34,10 +34,9 @@ public class CongeService {
      * Permet à un employé de soumettre une nouvelle demande de congé.
      * @param employeId
      * @param data
-     * @param result
      * @return
      */
-    public Conge createConge(Long employeId, CongeCreationDto data, BindingResult result){
+    public Conge createConge(Long employeId, CongeCreationDto data){
         Optional<Employe> employe = employeRepository.findById(employeId);
         if (employe.isEmpty()) {
             throw new RuntimeException("l'employer non trouvé !");
@@ -45,7 +44,7 @@ public class CongeService {
         Employe thisEmploye = employe.get();
         if (data.getDateDebut() != null && data.getDateFin() != null) {
             if (data.getDateDebut().isAfter(data.getDateFin())) {
-                result.rejectValue("dateFin", "DateError", "La date de fin doit être après la date de début.");
+                throw new RuntimeException("La date de fin doit être après la date de début.");
             }
         }
 
@@ -61,13 +60,14 @@ public class CongeService {
         conge.setDateDemande(LocalDate.now());
         conge.setCommentaire(data.getCommentaire());
         conge.setStatut(StatutConge.EN_ATTENTE);
+        conge.setType(data.getType());
 
         HistoriqueAction action = new HistoriqueAction();
         action.setAction("CREATION_DEMANDE");
         action.setDateAction(LocalDateTime.now());
         action.setUtilisateur(thisEmploye);
         action.setConge(conge);
-        // todo HistoriqueActionRepository.save(action)
+        action.setDetailsAction("creation de la demande de conge de type "+data.getType() +"pour l'employe "+thisEmploye.getNom());
         conge.getHistorique().add(action);
 
         return congeRepository.save(conge);
@@ -129,7 +129,6 @@ public class CongeService {
         action.setUtilisateur(employe);
         action.setConge(congeAModifier);
         action.setDetailsAction("Mise à jour des dates/type/commentaire par l'employé.");
-        // todo HistoriqueActionRepository.save(action)
         congeAModifier.getHistorique().add(action);
 
 
@@ -157,6 +156,39 @@ public class CongeService {
             throw new RuntimeException("Manager non trouvé !");
         }
         return congeRepository.findByEmploye(employe);
+    }
+
+    public void annulerConge(Long congeId, Long employeId) {
+        // 1. Récupérer les objets nécessaires
+        Optional<Conge> congeOptional = congeRepository.findById(congeId);
+        if(congeOptional.isEmpty()) {
+            throw new RuntimeException("Congé non trouvé avec l'ID : " + congeId);
+        }
+        Conge conge = congeOptional.get();
+
+        Optional<Employe> employeOptional = employeRepository.findById(employeId);
+        if(employeOptional.isEmpty()){
+            throw new RuntimeException("Utilisateur non trouvé avec l'ID : " + employeId);
+        }
+        Employe employe = employeOptional.get();
+
+
+        if (conge.getStatut() != StatutConge.EN_ATTENTE) {
+            throw new IllegalStateException("Ce congé ne peut plus être annulé car il a déjà été traité.");
+        }
+
+        conge.setStatut(StatutConge.ANNULE);
+
+        HistoriqueAction action = new HistoriqueAction();
+        action.setAction("ANNULATION_DEMANDE");
+        action.setDateAction(LocalDateTime.now());
+        action.setUtilisateur(employe);
+        action.setConge(conge);
+        action.setDetailsAction("La demande de congé a été annulée.");
+
+        conge.getHistorique().add(action);
+
+        congeRepository.save(conge);
     }
 
 

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,27 +46,24 @@ public class ManagerService {
     /**
      * ceation d'un nouveau manager
      * @param data
-     * @param result
      * @return
      */
 
-    public Manager creerManager(ManagerCreationRequest data , BindingResult result) {
+    public Manager creerManager(ManagerCreationRequest data ) {
         Optional<Utilisateur> potentialManager = utilisateurRepository.findByEmail(data.getEmail());
         if (potentialManager.isPresent()) {
-            result.rejectValue("email", "RegisterError", "Cette adresse email est déjà utilisée.");
+            throw  new RuntimeException( "Cette adresse email est déjà utilisée.");
 
         }
         if (!data.getMotDePasse().equals(data.getConfPassword())) {
-            result.rejectValue("confpassword", "register error", "Passwords must match");
+            throw  new RuntimeException( "Passwords must match");
 
         }
         Equipe equipe ;
         Optional<Equipe> equipeOptionnelle = equipeRepository.findById(data.getEquipeId());
         equipe = equipeOptionnelle.orElse(null);
 
-        if (result.hasErrors()) {
-            return null;
-        }
+
         String motDePasseHache = BCrypt.hashpw(data.getMotDePasse(), BCrypt.gensalt());
 
 
@@ -85,7 +83,7 @@ public class ManagerService {
 
 
 
-    public Conge approuverRefuserConge(long managerId , long idconge , UpdateStatutCongeDto data, BindingResult bindingResult) {
+    public Conge approuverRefuserConge(long managerId , long idconge , UpdateStatutCongeDto data) {
         Optional<Manager> managerOptional = managerRepository.findById(managerId);
         if (managerOptional.isEmpty()) {
             throw new RuntimeException("Manager non trouvé !");
@@ -101,8 +99,9 @@ public class ManagerService {
         }
 
         if(conge.getStatut() != StatutConge.EN_ATTENTE) {
-            throw new RuntimeException("Ce congé ne peut plus être approuvé.");
+            throw new IllegalStateException("Action impossible : le congé n'est plus en attente. Statut actuel : " + conge.getStatut());
         }
+
 
         StatutConge newStatu  ;
         if (data.getStatut().equals(StatutConge.VALIDE)) {
@@ -111,6 +110,8 @@ public class ManagerService {
             int annee = conge.getDateDebut().getYear();
             int mois = conge.getDateDebut().getMonthValue();
             CalendrierConge calendrier =calendrierCongeService.mettreAJourCalendrier(conge, annee, mois);
+
+
         }else if (data.getStatut() == StatutConge.REFUSE){
             newStatu=StatutConge.REFUSE;
         }else{
@@ -119,6 +120,13 @@ public class ManagerService {
         conge.setStatut(newStatu);
         conge.setValiderPar(manager);
 
+        HistoriqueAction action = new HistoriqueAction();
+        action.setAction("DEMANDE CONGE EST "+manager.getNom());
+        action.setDateAction(LocalDateTime.now());
+        action.setUtilisateur(manager);
+        action.setConge(conge);
+        action.setDetailsAction("Mise à jour le statut du conger par le manager");
+        conge.getHistorique().add(action);
         return  congeRepository.save(conge);
     }
 

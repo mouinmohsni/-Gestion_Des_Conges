@@ -25,6 +25,6 @@ public class HistoriqueAction {
     @ManyToOne
     @JoinColumn(name = "conge_id")
     private Conge conge ;
-
+//todo si il me reste du temps j'elargie la fonctionaliter sur tout l'application
 
 }
