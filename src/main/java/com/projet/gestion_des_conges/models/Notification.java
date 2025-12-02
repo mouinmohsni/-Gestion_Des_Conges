@@ -1,9 +1,13 @@
 package com.projet.gestion_des_conges.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name="notification")
 public class Notification {
@@ -14,15 +18,8 @@ public class Notification {
     private String message ;
     private String type ;
     private LocalDateTime dateEnvoi;
-    private String statut ;
-
-    public Utilisateur getDestinataire() {
-        return destinataire;
-    }
-
-    public void setDestinataire(Utilisateur destinataire) {
-        this.destinataire = destinataire;
-    }
+    @Enumerated(EnumType.STRING)
+    private StatutNotification  statut ;
 
     @ManyToOne
     @JoinColumn(name = "destinataire_id")

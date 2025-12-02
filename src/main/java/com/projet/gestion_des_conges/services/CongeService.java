@@ -21,12 +21,16 @@ import java.util.Optional;
 public class CongeService {
 
     private final CongeRepository congeRepository;
-    private final EmployeRepository employeRepository; // On en aura besoin
+    private final EmployeRepository employeRepository;
+    private final NotificationService  notificationService ;
 
     public CongeService(CongeRepository congeRepository,
-                        EmployeRepository employeRepository) {
+                        EmployeRepository employeRepository,
+                        NotificationService  notificationService) {
         this.congeRepository = congeRepository;
         this.employeRepository = employeRepository;
+        this.notificationService = notificationService;
+
     }
 
 
@@ -69,6 +73,10 @@ public class CongeService {
         action.setConge(conge);
         action.setDetailsAction("creation de la demande de conge de type "+data.getType() +"pour l'employe "+thisEmploye.getNom());
         conge.getHistorique().add(action);
+
+        Manager manager = thisEmploye.getEquipe().getManager();
+        String message = "Nouvelle demande de congé de " + thisEmploye.getPrenom() + " en attente de validation.";
+        notificationService.creerNotification(manager, message, "NOUVELLE_DEMANDE_CONGE");
 
         return congeRepository.save(conge);
 
@@ -131,9 +139,9 @@ public class CongeService {
         action.setDetailsAction("Mise à jour des dates/type/commentaire par l'employé.");
         congeAModifier.getHistorique().add(action);
 
-
-
-
+        Manager manager = employe.getEquipe().getManager();
+        String message = "L'employer " + employe.getPrenom() + " a modifier sont conger : en attente de validation.";
+        notificationService.creerNotification(manager, message, "CONGER_MODIFIER");
 
         return congeRepository.saveAndFlush(congeAModifier);
     }
@@ -188,10 +196,11 @@ public class CongeService {
 
         conge.getHistorique().add(action);
 
+        Manager manager = employe.getEquipe().getManager();
+        String message = "L'employer " + employe.getPrenom() + " a modifier sont conger : en attente de validation.";
+        notificationService.creerNotification(manager, message, "CONGER_ANNULER");
+
         congeRepository.save(conge);
     }
-
-
-
 
 }

@@ -26,13 +26,16 @@ public class ManagerService {
     final CalendrierCongeRepository calendrierCongeRepository ;
     final CalendrierCongeService calendrierCongeService;
     private final SoldeCongeService soldeCongeService;
+    private final NotificationService notificationService;
 
     public ManagerService(ManagerRepository managerRepository,
                           UtilisateurRepository utilisateurRepository,
                           EquipeRepository equipeRepository,
                           CongeRepository congeRepository,
                           CalendrierCongeRepository calendrierCongeRepository,
-                          CalendrierCongeService calendrierCongeService, SoldeCongeService soldeCongeService) {
+                          CalendrierCongeService calendrierCongeService,
+                          SoldeCongeService soldeCongeService,
+                          NotificationService notificationService) {
         this.managerRepository = managerRepository;
         this.utilisateurRepository = utilisateurRepository;
         this.equipeRepository = equipeRepository;
@@ -40,6 +43,7 @@ public class ManagerService {
         this.calendrierCongeRepository = calendrierCongeRepository;
         this.calendrierCongeService = calendrierCongeService;
         this.soldeCongeService = soldeCongeService;
+        this.notificationService =notificationService;
     }
 
 
@@ -126,7 +130,15 @@ public class ManagerService {
         action.setUtilisateur(manager);
         action.setConge(conge);
         action.setDetailsAction("Mise à jour le statut du conger par le manager");
+
         conge.getHistorique().add(action);
+
+        Employe employe = conge.getEmploye();
+        String statutReponse = (conge.getStatut() == StatutConge.VALIDE) ? "approuvée" : "refusée";
+        String message = "Votre demande de congé du " + conge.getDateDebut() + " a été " + statutReponse + ".";
+        notificationService.creerNotification(employe, message, "REPONSE_DEMANDE_CONGE");
+
+
         return  congeRepository.save(conge);
     }
 
