@@ -116,42 +116,7 @@ public class EmployeService {
         return employeRepository.findAll();
     }
 
-    /**
-     * Permet à un employé de soumettre une nouvelle demande de congé.
-     * @param employeId
-     * @param data
-     * @param result
-     * @return
-     */
-    public Conge demanderConge(Long employeId, CongeCreationDto data, BindingResult result){
-        Optional<Employe> employe = employeRepository.findById(employeId);
-        if (employe.isEmpty()) {
-            throw new RuntimeException("l'employer non trouvé !");
-        }
-        Employe thisEmploye = employe.get();
-        if (data.getDateDebut() != null && data.getDateFin() != null) {
-            if (data.getDateDebut().isAfter(data.getDateFin())) {
-                result.rejectValue("dateFin", "DateError", "La date de fin doit être après la date de début.");
-            }
-        }
-        Conge conge = new Conge();
-        conge.setDateDebut(data.getDateDebut());
-        conge.setDateFin(data.getDateFin());
-        conge.setEmploye(thisEmploye);
-        conge.setDateDemande(LocalDate.now());
-        conge.setCommentaire(data.getCommentaire());
-        conge.setStatut(StatutConge.EN_ATTENTE);
 
-        HistoriqueAction action = new HistoriqueAction();
-        action.setAction("CREATION_DEMANDE");
-        action.setDateAction(LocalDateTime.now());
-        action.setUtilisateur(thisEmploye);
-        action.setConge(conge);
-        conge.getHistorique().add(action);
-
-       return congeService.createConge(conge);
-
-    }
 
     /**
      * Récupère l'historique de toutes les demandes de congé d'un employé.

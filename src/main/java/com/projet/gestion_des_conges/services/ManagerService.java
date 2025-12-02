@@ -116,7 +116,7 @@ public class ManagerService {
 
             int annee = conge.getDateDebut().getYear();
             int mois = conge.getDateDebut().getMonthValue();
-            calendrierCongeService.mettreAJourCalendrier(conge, annee, mois);
+            CalendrierConge calendrier =calendrierCongeService.mettreAJourCalendrier(conge, annee, mois);
             soldeCongeRepository.save(soldeConge);
 
 

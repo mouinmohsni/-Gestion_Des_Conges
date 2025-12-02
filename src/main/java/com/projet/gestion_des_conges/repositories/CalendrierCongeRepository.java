@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface CalendrierCongeRepository extends JpaRepository<CalendrierConge, Long> {
 
    Optional<CalendrierConge> findByEquipeAndAnneeAndMois(String equipe, int annee, int mois);
+   Optional<CalendrierConge> findByAnneeAndMois(int annee, int mois);
 
 
 }
